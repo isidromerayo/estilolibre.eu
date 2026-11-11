@@ -14,24 +14,10 @@ Landing minimalista con estética de terminal retro, lista para desplegar en **C
 
 Sin build ni dependencias: HTML, CSS y JS puro.
 
-## Desplegar en Cloudflare
+## Desplegar
 
-### Opción A — Dashboard (drag & drop)
-1. Entra en [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Upload assets**.
-2. Nombre del proyecto: `estilolibre` (la web quedará en `estilolibre.pages.dev`).
-3. Arrastra esta carpeta completa y pulsa **Deploy**.
-
-### Opción B — Con Git (despliegue automático)
-1. Sube este proyecto a GitHub.
-2. En Cloudflare: **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-3. Selecciona el repositorio:
-   - **Framework preset:** None
-   - **Build command:** (vacío)
-   - **Output directory:** `/`
-4. Guarda; cada `git push` desplegará automáticamente.
-
-### Conectar el dominio propio
-Después del primer despliegue: proyecto → **Custom domains** → **Set up a custom domain** → `estilolibre.eu`. Cloudflare se encarga del DNS y del HTTPS automáticamente.
+El despliegue en Cloudflare lo gestiona el propietario. Los pasos no se documentan
+en este repositorio.
 
 ## Probar en local
 

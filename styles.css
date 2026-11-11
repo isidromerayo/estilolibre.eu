@@ -6,7 +6,7 @@
   --bg: #0a0c0a;
   --term: #0d120d;
   --green: #4af082;
-  --green-dim: #2a7a4c;
+  --green-dim: #5aa578; /* AA: 6.3:1 sobre --term (antes 2a7a4c, 3.6:1) */
   --amber: #ffb454;
   --white: #c8d6c8;
   --border: #1e2a1e;
@@ -102,7 +102,7 @@ body {
   width: 20px;
   height: 20px;
   font-size: 0.75rem;
-  color: var(--green-dim);
+  color: var(--green);
   border: 1px solid var(--border);
   border-radius: 3px;
   background: #101510;
@@ -132,11 +132,15 @@ body {
 .line { white-space: pre-wrap; word-break: break-all; }
 
 .line--cmd { color: var(--green); font-weight: 700; }
-.line--cmd::before {
-  content: "isidro@estilolibre:~$ ";
-  color: var(--green-dim);
-  font-weight: 400;
-}
+
+/* ===== PS1: prompt con colores por segmento ===== */
+.prompt { white-space: nowrap; }
+
+.p-user { color: var(--green); font-weight: 700; text-shadow: 0 0 8px rgba(74, 240, 130, 0.5); }
+.p-at, .p-sep, .p-dollar { color: var(--green-dim); }
+.p-host { color: #5bd0c8; text-shadow: 0 0 8px rgba(91, 208, 200, 0.4); }
+.p-path { color: #79b8ff; }
+.p-branch { color: var(--amber); }
 
 .line--out { color: var(--white); }
 .line--spacer { height: 0.7em; }
@@ -151,9 +155,15 @@ body {
   transition: background 0.15s, color 0.15s;
 }
 
-.line--link a:hover {
+.line--link a:hover,
+.line--link a:focus-visible {
   background: rgba(255, 180, 84, 0.12);
   color: #ffd28f;
+}
+
+.line--link a:focus-visible {
+  outline: 2px dashed var(--amber);
+  outline-offset: 3px;
 }
 
 .line--link a::before { content: "→ "; color: var(--green-dim); }
@@ -167,6 +177,19 @@ body {
   background: var(--green);
   animation: blink 1s steps(1) infinite;
   box-shadow: 0 0 8px rgba(74, 240, 130, 0.8);
+}
+
+/* texto solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @keyframes blink {

@@ -11,7 +11,6 @@ const LINES = [
   { type: "out", html: "#LosIndiesNoTomanElSol #QueJodidoEsSerModerno" },
   { type: "out", html: "#ViveLeRock #vermú" },
   { type: "out", html: "emigrante en #Valladolor. bembibre, #ElBierzo." },
-  { type: "out", html: "ideas, código y vida, con estilo libre." },
   { type: "cmd", text: "ls ~/redes" },
   {
     type: "link",
@@ -35,12 +34,29 @@ function makeLine(line) {
   const el = document.createElement("div");
   el.className =
     `line line--${line.type}` + (line.dim ? " line--dim" : "");
+  if (line.type === "cmd") el.appendChild(makePrompt());
   return el;
+}
+
+// PS1: imc@estilolibre.eu:~ (main)$ con colores por segmento
+function makePrompt() {
+  const p = document.createElement("span");
+  p.className = "prompt";
+  p.innerHTML =
+    '<span class="p-user">imc</span>' +
+    '<span class="p-at">@</span>' +
+    '<span class="p-host">estilolibre.eu</span>' +
+    '<span class="p-sep">:</span>' +
+    '<span class="p-path">~</span>' +
+    ' <span class="p-branch">(main)</span>' +
+    '<span class="p-dollar">$ </span>';
+  return p;
 }
 
 function makeCursor() {
   const c = document.createElement("span");
   c.className = "cursor";
+  c.setAttribute("aria-hidden", "true");
   return c;
 }
 
@@ -65,9 +81,12 @@ async function run() {
         const a = document.createElement("a");
         a.href = line.href;
         a.textContent = line.label;
+        a.setAttribute("aria-label", `Perfil en ${line.label}`);
         el.appendChild(a);
       } else if (line.type === "out") {
         el.innerHTML = line.html;
+      } else if (line.type === "cmd") {
+        el.appendChild(document.createTextNode(line.text));
       }
       continue;
     }
@@ -82,6 +101,7 @@ async function run() {
         const a = document.createElement("a");
         a.href = line.href;
         a.textContent = line.label;
+        a.setAttribute("aria-label", `Perfil en ${line.label}`);
         el.appendChild(a);
       } else if (line.html !== undefined) {
         el.innerHTML = line.html;
