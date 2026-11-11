@@ -1,0 +1,206 @@
+/* =========================================================
+   estilolibre.eu — terminal retro, minimalista
+   ========================================================= */
+
+:root {
+  --bg: #0a0c0a;
+  --term: #0d120d;
+  --green: #4af082;
+  --green-dim: #2a7a4c;
+  --amber: #ffb454;
+  --white: #c8d6c8;
+  --border: #1e2a1e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  font-family: "JetBrains Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ===== efecto CRT: scanlines + viñeta ===== */
+.crt {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.12) 0px,
+    rgba(0, 0, 0, 0.12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+/* ===== layout ===== */
+.wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  gap: 1.2rem;
+}
+
+/* ===== terminal ===== */
+.terminal {
+  width: min(680px, 100%);
+  background: var(--term);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(74, 240, 130, 0.06),
+    0 0 60px rgba(74, 240, 130, 0.07),
+    0 20px 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.terminal__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.9rem;
+  background: #141a14;
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal__controls {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.win-btn {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  font-size: 0.75rem;
+  color: var(--green-dim);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: #101510;
+}
+
+.win-btn--close:hover {
+  color: #ff5f56;
+  border-color: #ff5f56;
+}
+
+.terminal__title {
+  font-size: 0.75rem;
+  color: var(--green-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal__body {
+  padding: 1.4rem 1.5rem 1.8rem;
+  font-size: 0.92rem;
+  line-height: 1.9;
+  min-height: 21em;
+}
+
+/* ===== líneas de terminal ===== */
+.line { white-space: pre-wrap; word-break: break-all; }
+
+.line--cmd { color: var(--green); font-weight: 700; }
+.line--cmd::before {
+  content: "isidro@estilolibre:~$ ";
+  color: var(--green-dim);
+  font-weight: 400;
+}
+
+.line--out { color: var(--white); }
+.line--spacer { height: 0.7em; }
+.line--dim { color: var(--green-dim); }
+.line--dim { color: var(--green-dim); }
+.line--link { color: var(--amber); }
+
+.line--link a {
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(255, 180, 84, 0.4);
+  transition: background 0.15s, color 0.15s;
+}
+
+.line--link a:hover {
+  background: rgba(255, 180, 84, 0.12);
+  color: #ffd28f;
+}
+
+.line--link a::before { content: "→ "; color: var(--green-dim); }
+
+/* cursor que parpadea */
+.cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  vertical-align: text-bottom;
+  background: var(--green);
+  animation: blink 1s steps(1) infinite;
+  box-shadow: 0 0 8px rgba(74, 240, 130, 0.8);
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* resaltar texto verde en salidas */
+.out-accent { color: var(--green); }
+
+/* ===== footer ===== */
+.footer {
+  width: min(680px, 100%);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: var(--green);
+}
+
+.footer__dim { color: var(--green-dim); }
+
+/* ===== responsive ===== */
+@media (max-width: 640px) {
+  .terminal__body {
+    font-size: 0.8rem;
+    padding: 1.1rem 1rem 1.4rem;
+    min-height: 20em;
+  }
+
+  .terminal__title { font-size: 0.7rem; }
+}
+
+/* ===== accesibilidad: sin animaciones ===== */
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; }
+}
