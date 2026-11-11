@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Inject deploy date
+        id: inject
         env:
           RUN_STARTED_AT: ${{ github.run_started_at }}
           COMMIT_SHA: ${{ github.sha }}
@@ -26,6 +27,7 @@ jobs:
             echo "::error::marcadores __DEPLOYED_*__ sin resolver en public/index.html"
             exit 1
           fi
+          echo "stamp=$STAMP" >> "$GITHUB_OUTPUT"
           echo "desplegado $LABEL (${COMMIT_SHA:0:7})"
 
       - name: Deploy
@@ -35,3 +37,41 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
           wranglerVersion: latest
+
+      - name: Verify live deploy
+        env:
+          VERIFY_URL: https://estilolibre-eu.isidro-merayo.workers.dev
+          STAMP: ${{ steps.inject.outputs.stamp }}
+        run: |
+          # Se comprueba el tail del worker, no el dominio propio: así la prueba no
+          # depende de la caché del borde. La cabecera Authorization hace que
+          # Cloudflare no sirva una copia cacheada del HTML.
+          #
+          # Se muestrea tres veces porque el duplicado histórico (Workers Builds)
+          # publicaba ~45 s DESPUÉS de este workflow: una sola comprobación habría
+          # dado verde y la versión quedaba pisada justo después, que es exactamente
+          # cómo el pie perdió la fecha sin que el deploy fallara.
+          for sample in 1 2 3; do
+            found=""
+            for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+              body="$(curl -sS --max-time 20 -H 'Authorization: Bearer verify' "$VERIFY_URL/?run=$GITHUB_RUN_ID-$sample-$attempt" || true)"
+              if printf '%s' "$body" | grep -qF "$STAMP"; then
+                found="si"
+                break
+              fi
+              if printf '%s' "$body" | grep -q "__DEPLOYED"; then
+                echo "::error::la URL en vivo sirve los marcadores __DEPLOYED_*__ sin resolver."
+                echo "::error::otro pipeline esta publicando este repo sin el paso de inyeccion."
+                echo "::error::solo este workflow debe desplegar: desconecta la integracion Git"
+                echo "::error::de Cloudflare (Workers Builds) en el panel y repite el deploy."
+                exit 1
+              fi
+              sleep 5
+            done
+            if [ -z "$found" ]; then
+              echo "::error::muestra $sample: no aparece el sello $STAMP en $VERIFY_URL tras 60 s"
+              exit 1
+            fi
+            echo "muestra $sample: en vivo desplegado $STAMP"
+            if [ "$sample" != "3" ]; then sleep 45; fi
+          done

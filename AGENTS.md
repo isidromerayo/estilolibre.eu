@@ -27,7 +27,14 @@ Static personal landing page (Spanish) with a retro-terminal aesthetic. Deploys 
 
 ## Deployment
 
-- **Deploys automatically via GitHub Actions** (`.github/workflows/deploy.yml`): every push to `main` runs `wrangler deploy` with `wrangler.jsonc` (worker `estilolibre-eu`, static assets from `public/`).
+- **Deploys automatically via GitHub Actions — and only via GitHub Actions** (`.github/workflows/deploy.yml`): every push to `main` runs `wrangler deploy` with `wrangler.jsonc` (worker `estilolibre-eu`, static assets from `public/`).
+- **Exactly one deployer.** The repo is also wired to Cloudflare's Git integration ("Workers Builds"), which builds the same code **without** the deploy-date injection step and lands ~45 s *after* Actions, silently replacing the version — that is how the footer lost its date while both pipelines reported success. Keep the Git integration disconnected (Workers & Pages → `estilolibre-eu` → Settings → Builds & deployments → disconnect). Check for a second pipeline on any commit:
+
+  ```bash
+  gh api repos/isidromerayo/estilolibre.eu/commits/<sha>/check-runs --jq '.check_runs[].name'
+  ```
+
+  Anything other than `deploy` means two deployers are racing. The workflow's `Verify live deploy` step re-fetches the workers.dev tail three times over ~2 min and fails if `__DEPLOYED` markers (or a missing stamp) show up in the live HTML.
 - Requires repo secrets `CLOUDFLARE_API_TOKEN` (Account · Workers Scripts · Edit) and `CLOUDFLARE_ACCOUNT_ID` — manage them in GitHub, never commit them.
 - Do not commit tokens, API keys or account specifics anywhere in the repo.
 
