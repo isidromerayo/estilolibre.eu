@@ -40,3 +40,6 @@ python3 -m http.server 8080 --directory public
 - **Colores:** variables CSS en la cabecera de `styles.css`
   (`--green` para el texto principal, `--amber` para los enlaces).
 - **Redes:** objetos `link` dentro de `LINES` en `script.js`.
+- **Colores claros:** botón `☀︎` en la barra de la terminal. La preferencia se
+  guarda en `localStorage.theme` y se aplica antes del primer pintado desde un
+  `<script>` en el `<head>`; sin tocar el botón la página siempre es oscura.

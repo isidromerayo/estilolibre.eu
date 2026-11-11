@@ -12,7 +12,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <script>
+    // El tema se aplica antes del primer pintado para que no haya flash.
+    // Sin este script (o sin JS) la página queda en el modo oscuro de siempre.
+    try {
+      if (localStorage.getItem("theme") === "light") {
+        document.documentElement.dataset.theme = "light";
+      }
+    } catch (err) {
+      /* localStorage bloqueado: mantener oscuro */
+    }
+  </script>
+  <link rel="stylesheet" href="styles.css?v=8" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 </head>
 <body>
@@ -25,10 +36,18 @@
     <div class="terminal">
       <div class="terminal__bar">
         <span class="terminal__title">Terminal — estilolibre.eu: ~</span>
-        <div class="terminal__controls" aria-hidden="true">
-          <span class="win-btn">–</span>
-          <span class="win-btn">&#x25A1;&#xFE0E;</span>
-          <span class="win-btn win-btn--close">×</span>
+        <div class="terminal__actions">
+          <!-- el botón va fuera de .terminal__controls: ese div es aria-hidden
+               y un elemento focusable dentro sería invisible para lectores -->
+          <button type="button" class="theme-toggle" id="theme" aria-pressed="false">
+            <span class="theme-toggle__glyph" aria-hidden="true">&#x2600;&#xFE0E;</span>
+            <span class="sr-only">colores claros</span>
+          </button>
+          <div class="terminal__controls" aria-hidden="true">
+            <span class="win-btn">–</span>
+            <span class="win-btn">&#x25A1;&#xFE0E;</span>
+            <span class="win-btn win-btn--close">×</span>
+          </div>
         </div>
       </div>
 
@@ -46,6 +65,6 @@
     </footer>
   </main>
 
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>

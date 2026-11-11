@@ -22,6 +22,7 @@ const LINES = [
     label: "github.com/isidromerayo",
     href: "https://github.com/isidromerayo",
   },
+  { type: "out", html: "¿colores claros? el botón de arriba a la derecha", dim: true },
   { type: "cmd", text: "" }, // prompt final vacío, con cursor
 ];
 
@@ -29,6 +30,37 @@ const term = document.getElementById("term");
 const reduceMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)"
 ).matches;
+
+// ===== tema: oscuro por defecto, "colores claros" opcional =====
+const THEME_KEY = "theme";
+const themeBtn = document.getElementById("theme");
+const themeGlyph = themeBtn?.querySelector(".theme-toggle__glyph");
+
+// el <script> del head ya decidió el tema; ausente = oscuros
+const currentTheme = () =>
+  document.documentElement.dataset.theme === "light" ? "light" : "dark";
+
+// solo pinta el botón: no escribe data-theme, para no pisar lo que hay
+function syncThemeButton(theme) {
+  if (!themeBtn) return;
+  themeBtn.setAttribute("aria-pressed", String(theme === "light"));
+  // ☀︎ pide los claros, ☾︎ devuelve los oscuros (VS15: presentación de texto)
+  if (themeGlyph) themeGlyph.textContent = theme === "light" ? "\u263E\uFE0E" : "\u2600\uFE0E";
+}
+
+if (themeBtn) {
+  syncThemeButton(currentTheme());
+  themeBtn.addEventListener("click", () => {
+    const next = currentTheme() === "light" ? "dark" : "light";
+    document.documentElement.dataset.theme = next;
+    syncThemeButton(next);
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch (err) {
+      /* se cambia en memoria, solo se pierde al recargar */
+    }
+  });
+}
 
 function makeLine(line) {
   const el = document.createElement("div");

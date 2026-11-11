@@ -1,5 +1,11 @@
 {
-  "urls": ["http://localhost:8080"],
+  "urls": [
+    "http://localhost:8080",
+    {
+      "url": "http://localhost:8080",
+      "actions": ["click element #theme"]
+    }
+  ],
   "defaults": {
     "standard": "WCAG2AA",
     "runners": ["axe"]

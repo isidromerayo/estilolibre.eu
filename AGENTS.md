@@ -17,10 +17,12 @@ Static personal landing page (Spanish) with a retro-terminal aesthetic. Deploys 
    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium pa11y-ci --config .pa11y-ci.json
    ```
 
-   - Config (`.pa11y-ci.json`) uses `standard: WCAG2AA` + `runners: ["axe"]`.
+   - Config (`.pa11y-ci.json`) uses `standard: WCAG2AA` + `runners: ["axe"]`, dos entradas de URL sobre la misma página: tema oscuro por defecto y tema claro tras pulsar `#theme`.
    - axe-core is what provides **WCAG 2.2 AA** coverage: the bundled HTML CodeSniffer (2.6) predates 2.2 and does not check its SCs (2.4.11, 3.3.7, 2.5.8…).
    - The global pa11y-ci's puppeteer ignores `chromeLaunchConfig` from the JSON — the `PUPPETEER_EXECUTABLE_PATH` env var is the only thing that makes it use the system Chromium. Do not remove it.
    - Emoji-presentation glyphs (e.g. `□` alone) break axe's color-contrast measurement and false-fail; force text presentation with `&#xFE0E;`.
+   - **Audit both themes**, not just the default. `.pa11y-ci.json` lists `http://localhost:8080` twice: once as-is (oscuro) and once with `"actions": ["click element #theme"]`, so axe measures the light palette after really pressing the toggle. Keep both entries — a light token that measures fine on `--term` can still fail on `--bar`/`--btn` (that's how `--green-dim` at 4.07:1 slipped through), and check every background a variable actually lands on.
+   - Do not add `transition` on `background-color`/`color` for theme changes: axe samples the interpolated value, so the audit fails on text that is mid-fade over a background that already switched.
 3. Also eyeball the page at `http://localhost:8080` — the terminal session must type itself end to end with the blinking cursor as final prompt.
 
 ## Deployment
@@ -43,3 +45,4 @@ Static personal landing page (Spanish) with a retro-terminal aesthetic. Deploys 
 - Colors/theme: CSS variables in `:root` of `public/styles.css` (phosphor green `--green`, amber links `--amber`).
 - Accessibility: respect `prefers-reduced-motion` — effects added in `script.js` must check the `reduceMotion` flag.
 - Deploy date (footer): `deploy.yml` `sed`-replaces the `__DEPLOYED_ISO__` / `__DEPLOYED_LABEL__` markers in `public/index.html` with the run timestamp. Keep the marker names in sync between HTML and workflow — the step fails the build if any marker is left unresolved. Locally `script.js` removes the `#deployed` span, so the footer shows no date in preview (that's expected, not a bug).
+- Theme ("colores claros"): dark stays the default in `:root`; light is `:root[data-theme="light"]` in `public/styles.css`. The inline `<head>` script in `index.html` reads `localStorage.theme` **before first paint** (no flash), and `script.js` only syncs the `#theme` button (`aria-pressed` + glyph) and writes the preference. **Every color must reference a CSS variable** — no literal hex outside those two blocks — or light mode silently misses it (that's how `.terminal__title` over `--bar`, `--cyan` and `--blue` first failed AA).
