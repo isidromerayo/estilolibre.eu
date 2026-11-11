@@ -119,3 +119,8 @@ run();
 
 // año del footer
 document.getElementById("year").textContent = new Date().getFullYear();
+
+// fecha de despliegue: el CI (deploy.yml) sustituye los marcadores __DEPLOYED_*__
+// de index.html. En la vista local siguen sin resolver, así que se quita el span.
+const deployed = document.getElementById("deployed");
+if (deployed && deployed.textContent.includes("__DEPLOYED")) deployed.remove();

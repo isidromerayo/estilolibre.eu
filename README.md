@@ -10,7 +10,7 @@ Landing minimalista con estética de terminal retro, lista para desplegar en **C
 | `public/styles.css`  | Estilos: CRT verde sobre negro, monoespaciada       |
 | `public/script.js`   | Efecto máquina de escribir + cursor parpadeante     |
 | `public/favicon.svg` | Icono del sitio                                     |
-| `public/_headers`    | Reglas de caché para el hosting estático            |
+| `public/_headers`    | Caché: HTML revalidado, assets con TTL largo (sin regla `/*`) |
 | `wrangler.jsonc`     | Config de despliegue en Cloudflare Workers          |
 
 Sin build ni dependencias: HTML, CSS y JS puro.
@@ -20,6 +20,11 @@ Sin build ni dependencias: HTML, CSS y JS puro.
 Automático: cada push a `main` despliega en Cloudflare Workers mediante
 GitHub Actions (necesita los secrets `CLOUDFLARE_API_TOKEN` y
 `CLOUDFLARE_ACCOUNT_ID` en el repo).
+
+En el mismo workflow, el paso *Inject deploy date* sustituye en
+`public/index.html` los marcadores `__DEPLOYED_ISO__` y `__DEPLOYED_LABEL__`
+por la fecha UTC de la ejecución, que es la que se muestra en el pie.
+Localmente esos marcadores no se resuelven y `script.js` quita el texto.
 
 ## Probar en local
 

@@ -1,5 +1,21 @@
-/*
-  Cache-Control: public, max-age=3600
+# estilolibre.eu — cabeceras para Workers static assets
+#
+# NO hay regla /* a propósito. Las reglas que casa un mismo path se acumulan
+# y una cabecera repetida se une con comas, así que un /* con Cache-Control
+# envenenaba a las reglas específicas: /styles.css respondía
+# "public, max-age=3600, public, max-age=86400" y con dos max-age (RFC 9111
+# 4.2.1) manda el primero o se considera obsoleto. Es decir: el 86400 no se
+# aplicaba.
+#
+# El HTML siempre se revalida: la fecha de despliegue del pie vive en
+# index.html (la inyecta el CI) y Workers no manda ETag para /, así que sin
+# max-age=0 quedaría caduca hasta una hora en navegador y borde.
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
 
 /styles.css
   Cache-Control: public, max-age=86400

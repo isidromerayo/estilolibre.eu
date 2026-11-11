@@ -210,6 +210,13 @@ body {
   color: var(--green);
 }
 
+.footer__meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .footer__dim { color: var(--green-dim); }
 
 /* ===== responsive ===== */

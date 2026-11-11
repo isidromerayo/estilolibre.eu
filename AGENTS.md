@@ -34,6 +34,7 @@ Static personal landing page (Spanish) with a retro-terminal aesthetic. Deploys 
 - **Git identity is not configured globally.** Every commit needs explicit `-c user.name="Isidro Merayo" -c user.email="isidromerayo@users.noreply.github.com"`.
 - Commits follow Conventional Commits (`feat:`, `fix:`, …), lowercase, no trailing period.
 - **Cache-busting: `index.html` references `styles.css?v=N` and `script.js?v=N`. Bump both `N` on every CSS/JS change** or stale browser cache shows broken mixes (this already bit once: a prompt rewrite vanished until versions were bumped).
+- **`public/_headers`: never add a blanket `/*` `Cache-Control` rule.** Matching rules accumulate and a repeated header is comma-joined, so `/*` silently overrides the per-file TTLs (two `max-age` directives → RFC 9111 §4.2.1 keeps the first). Keep `/` and `/index.html` at `max-age=0, must-revalidate`: the footer's deploy date lives in the HTML and the `?v=N` bump cannot refresh it.
 
 ## Where content lives
 
@@ -41,3 +42,4 @@ Static personal landing page (Spanish) with a retro-terminal aesthetic. Deploys 
 - Prompt (PS1): `makePrompt()` in `public/script.js` builds colored spans; colors map to CSS classes `.p-*` in `public/styles.css`.
 - Colors/theme: CSS variables in `:root` of `public/styles.css` (phosphor green `--green`, amber links `--amber`).
 - Accessibility: respect `prefers-reduced-motion` — effects added in `script.js` must check the `reduceMotion` flag.
+- Deploy date (footer): `deploy.yml` `sed`-replaces the `__DEPLOYED_ISO__` / `__DEPLOYED_LABEL__` markers in `public/index.html` with the run timestamp. Keep the marker names in sync between HTML and workflow — the step fails the build if any marker is left unresolved. Locally `script.js` removes the `#deployed` span, so the footer shows no date in preview (that's expected, not a bug).

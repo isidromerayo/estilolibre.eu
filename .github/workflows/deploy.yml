@@ -14,6 +14,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Inject deploy date
+        env:
+          RUN_STARTED_AT: ${{ github.run_started_at }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          STAMP="${RUN_STARTED_AT:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
+          LABEL="$(date -u -d "$STAMP" '+%Y-%m-%d %H:%M UTC' 2>/dev/null || echo "$STAMP")"
+          sed -i "s|__DEPLOYED_ISO__|$STAMP|g; s|__DEPLOYED_LABEL__|$LABEL|g" public/index.html
+          if grep -q "__DEPLOYED" public/index.html; then
+            echo "::error::marcadores __DEPLOYED_*__ sin resolver en public/index.html"
+            exit 1
+          fi
+          echo "desplegado $LABEL (${COMMIT_SHA:0:7})"
+
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
