@@ -4,25 +4,27 @@ Landing minimalista con estética de terminal retro, lista para desplegar en **C
 
 ## Archivos
 
-| Archivo       | Descripción                                        |
-| ------------- | -------------------------------------------------- |
-| `index.html`  | Estructura de la página (ventana de terminal)       |
-| `styles.css`  | Estilos: CRT verde sobre negro, monoespaciada       |
-| `script.js`   | Efecto máquina de escribir + cursor parpadeante     |
-| `favicon.svg` | Icono del sitio                                     |
-| `_headers`    | Reglas de caché para Cloudflare Pages               |
+| Archivo            | Descripción                                        |
+| ------------------ | -------------------------------------------------- |
+| `public/index.html`  | Estructura de la página (ventana de terminal)       |
+| `public/styles.css`  | Estilos: CRT verde sobre negro, monoespaciada       |
+| `public/script.js`   | Efecto máquina de escribir + cursor parpadeante     |
+| `public/favicon.svg` | Icono del sitio                                     |
+| `public/_headers`    | Reglas de caché para el hosting estático            |
+| `wrangler.jsonc`     | Config de despliegue en Cloudflare Workers          |
 
 Sin build ni dependencias: HTML, CSS y JS puro.
 
 ## Desplegar
 
-El despliegue en Cloudflare lo gestiona el propietario. Los pasos no se documentan
-en este repositorio.
+Automático: cada push a `main` despliega en Cloudflare Workers mediante
+GitHub Actions (necesita los secrets `CLOUDFLARE_API_TOKEN` y
+`CLOUDFLARE_ACCOUNT_ID` en el repo).
 
 ## Probar en local
 
 ```bash
-python3 -m http.server 8080
+python3 -m http.server 8080 --directory public
 # abre http://localhost:8080
 ```
 

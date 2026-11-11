@@ -5,11 +5,12 @@ Static personal landing page (Spanish) with a retro-terminal aesthetic. Deploys 
 ## Stack & commands
 
 - Plain HTML/CSS/JS. **No build step, no dependencies, no linting.** Do not add a bundler or framework.
-- Local preview: `python3 -m http.server 8080` from the repo root.
+- Local preview: `python3 -m http.server 8080 --directory public` from the repo root.
+- The site lives in `public/` — that directory is the deploy unit. Repo-root files (`AGENTS.md`, `README.md`, `.github/`, `.pa11y-ci.json`, `wrangler.jsonc`) must never end up served on the site.
 
 ## Verification (required before commit)
 
-1. Start the preview: `python3 -m http.server 8080` (repo root, keep it running).
+1. Start the preview: `python3 -m http.server 8080 --directory public` (repo root, keep it running).
 2. Run the accessibility audit — **must pass with 0 errors**:
 
    ```bash
@@ -24,7 +25,8 @@ Static personal landing page (Spanish) with a retro-terminal aesthetic. Deploys 
 
 ## Deployment
 
-- Deployed to Cloudflare by the owner. **No CI/CD in this repo** — do not add deploy automation without asking; deployment details are handled outside the repository.
+- **Deploys automatically via GitHub Actions** (`.github/workflows/deploy.yml`): every push to `main` runs `wrangler deploy` with `wrangler.jsonc` (worker `estilolibre-eu`, static assets from `public/`).
+- Requires repo secrets `CLOUDFLARE_API_TOKEN` (Account · Workers Scripts · Edit) and `CLOUDFLARE_ACCOUNT_ID` — manage them in GitHub, never commit them.
 - Do not commit tokens, API keys or account specifics anywhere in the repo.
 
 ## Repo conventions
@@ -35,7 +37,7 @@ Static personal landing page (Spanish) with a retro-terminal aesthetic. Deploys 
 
 ## Where content lives
 
-- Terminal script (typed lines, manifesto text, social links): the `LINES` array at the top of `script.js`. Line types: `cmd` (typed), `out`, `dim`, `link`, `spacer`.
-- Prompt (PS1): `makePrompt()` in `script.js` builds colored spans; colors map to CSS classes `.p-*` in `styles.css`.
-- Colors/theme: CSS variables in `:root` of `styles.css` (phosphor green `--green`, amber links `--amber`).
+- Terminal script (typed lines, manifesto text, social links): the `LINES` array at the top of `public/script.js`. Line types: `cmd` (typed), `out`, `dim`, `link`, `spacer`.
+- Prompt (PS1): `makePrompt()` in `public/script.js` builds colored spans; colors map to CSS classes `.p-*` in `public/styles.css`.
+- Colors/theme: CSS variables in `:root` of `public/styles.css` (phosphor green `--green`, amber links `--amber`).
 - Accessibility: respect `prefers-reduced-motion` — effects added in `script.js` must check the `reduceMotion` flag.
